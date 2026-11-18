@@ -9,10 +9,12 @@
 ## 🚀 Install
 
 ```bash
+brew tap falkenslab/tap
+brew trust falkenslab/tap
 brew install --cask falkenslab/tap/miyagi
 ```
 
-Homebrew adds this tap on the first install. Update with `brew upgrade --cask miyagi`, uninstall with `brew uninstall --cask miyagi`.
+Recent Homebrew only loads casks from taps you trust, hence `brew trust` (an older Homebrew has no such command: skip it). Update with `brew upgrade --cask miyagi`, uninstall with `brew uninstall --cask miyagi`.
 
 ## 📦 Casks
 

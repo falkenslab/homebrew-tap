@@ -22,6 +22,10 @@ jobs:
           tap="$(brew --repository)/Library/Taps/falkenslab/homebrew-tap"
           mkdir -p "$(dirname "$tap")"
           ln -s "$GITHUB_WORKSPACE" "$tap"
+      # Recent Homebrew refuses casks from a tap the person hasn't trusted; older ones have no `trust`.
+      - name: Trust the tap, as the README asks
+        run: |
+          if brew help trust >/dev/null 2>&1; then brew trust falkenslab/tap; else echo "no brew trust in this Homebrew"; fi
       - run: brew style --cask falkenslab/tap/miyagi
       - run: brew audit --cask --strict falkenslab/tap/miyagi
       - run: brew install --cask falkenslab/tap/miyagi
