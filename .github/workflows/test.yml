@@ -1,0 +1,36 @@
+# Every cask, checked on a real Mac: Homebrew's style and audit, then installed from this tap the way
+# a person would, its app's version read, and uninstalled.
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  miyagi:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: This checkout as the falkenslab/tap tap
+        run: |
+          tap="$(brew --repository)/Library/Taps/falkenslab/homebrew-tap"
+          mkdir -p "$(dirname "$tap")"
+          ln -s "$GITHUB_WORKSPACE" "$tap"
+      - run: brew style --cask falkenslab/tap/miyagi
+      - run: brew audit --cask --strict falkenslab/tap/miyagi
+      - run: brew install --cask falkenslab/tap/miyagi
+      - name: The app is installed, with the cask's version, and without quarantine
+        run: |
+          expected=$(brew info --cask --json=v2 falkenslab/tap/miyagi | python3 -c 'import json,sys; print(json.load(sys.stdin)["casks"][0]["version"])')
+          installed=$(defaults read /Applications/miyagi.app/Contents/Info.plist CFBundleShortVersionString)
+          echo "cask $expected, app $installed"
+          test "$installed" = "$expected"
+          ! xattr -p com.apple.quarantine /Applications/miyagi.app 2>/dev/null
+          file /Applications/miyagi.app/Contents/MacOS/miyagi
+      - run: brew uninstall --cask falkenslab/tap/miyagi
