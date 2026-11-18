@@ -22,7 +22,12 @@ Homebrew adds this tap on the first install. Update with `brew upgrade --cask mi
 
 ## ⚠️ Unsigned apps
 
-These apps aren't signed with an Apple Developer ID yet. Each cask removes the download quarantine after installing, so macOS opens the app instead of reporting it as damaged. Your data is never touched: miyagi keeps your subjects in `~/.miyagi`, and uninstalling, even with `--zap`, leaves them there.
+These apps aren't signed with an Apple Developer ID yet. If macOS won't open one, or says it is damaged, remove the download quarantine once, as `brew install` reminds you:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/miyagi.app
+```
+ Your data is never touched: miyagi keeps your subjects in `~/.miyagi`, and uninstalling, even with `--zap`, leaves them there.
 
 ## 🔄 How the casks are updated
 

@@ -15,16 +15,9 @@ cask "miyagi" do
     strategy :github_latest
   end
 
-  depends_on macos: ">= :monterey"
+  depends_on macos: :monterey
 
   app "miyagi.app"
-
-  # The app isn't signed by a Developer ID yet (only ad hoc): without this, Gatekeeper reports it
-  # as damaged on first launch.
-  postflight do
-    system_command "/usr/bin/xattr",
-                   args: ["-dr", "com.apple.quarantine", "#{appdir}/miyagi.app"]
-  end
 
   # Only Electron's caches: the teacher's subjects and settings live in ~/.miyagi and are never removed.
   zap trash: [
@@ -33,9 +26,14 @@ cask "miyagi" do
     "~/Library/Saved Application State/dev.falkenslab.miyagi.savedState",
   ]
 
+  # The app is only ad hoc signed (no Apple Developer ID yet): the caveats say how to open it.
   caveats <<~EOS
-    miyagi isn't signed with an Apple Developer ID yet. This cask removes the
-    download quarantine so macOS lets it open. Your subjects are kept in
-    ~/.miyagi, and uninstalling (even with --zap) never deletes them.
+    miyagi isn't signed with an Apple Developer ID yet. If macOS won't open it,
+    or says it is damaged, remove the download quarantine once:
+
+      xattr -dr com.apple.quarantine /Applications/miyagi.app
+
+    Your subjects are kept in ~/.miyagi, and uninstalling (even with --zap)
+    never deletes them.
   EOS
 end

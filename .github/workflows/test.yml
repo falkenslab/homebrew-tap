@@ -25,12 +25,13 @@ jobs:
       - run: brew style --cask falkenslab/tap/miyagi
       - run: brew audit --cask --strict falkenslab/tap/miyagi
       - run: brew install --cask falkenslab/tap/miyagi
-      - name: The app is installed, with the cask's version, and without quarantine
+      - name: The app is installed, with the cask's version
         run: |
           expected=$(brew info --cask --json=v2 falkenslab/tap/miyagi | python3 -c 'import json,sys; print(json.load(sys.stdin)["casks"][0]["version"])')
           installed=$(defaults read /Applications/miyagi.app/Contents/Info.plist CFBundleShortVersionString)
           echo "cask $expected, app $installed"
           test "$installed" = "$expected"
-          ! xattr -p com.apple.quarantine /Applications/miyagi.app 2>/dev/null
+          # What the caveats tell the person to run, if macOS won't open it.
+          xattr -dr com.apple.quarantine /Applications/miyagi.app
           file /Applications/miyagi.app/Contents/MacOS/miyagi
       - run: brew uninstall --cask falkenslab/tap/miyagi
